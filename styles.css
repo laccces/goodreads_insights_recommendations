@@ -1,292 +1,532 @@
+/* ============================================
+   Library Insights - Dark Glassy Theme
+   ============================================ */
+
+/* CSS Variables */
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: rgba(30, 41, 59, 0.6);
+    --accent: #10b981;
+    --accent-hover: #34d399;
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-muted: rgba(255, 255, 255, 0.4);
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --transition: all 0.2s ease;
+}
+
+/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Body & Background */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--bg-primary);
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    color: var(--text-primary);
+    min-height: 100vh;
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
-    padding: 2rem;
+}
+
+/* App Container */
+.app-container {
+    min-height: 100vh;
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+.main-content {
+    padding: 32px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-header {
+.app-header {
     text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #ddd;
+    margin-bottom: 40px;
+    padding: 20px 0;
 }
 
-header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
+.app-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
 }
 
-header p {
-    color: #666;
-    font-size: 1.1rem;
+.app-header p {
+    color: var(--text-muted);
+    font-size: 1rem;
 }
 
-section {
-    background: white;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Content Cards */
+.content-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
-section h2 {
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
+.content-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-header h2 {
     font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-#upload-section {
-    text-align: center;
+/* Typography */
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
 }
 
-#csv-input {
-    padding: 1rem;
-    border: 2px dashed #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 400px;
+h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
 }
 
-#csv-input:hover {
-    border-color: #2c3e50;
+p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
 }
 
-.hint {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 1rem;
+/* ============================================
+   Upload Section
+   ============================================ */
+.upload-area {
+    margin-top: 24px;
 }
 
-#debug-output {
-    background: #1a1a1a;
-    color: #00ff00;
-    padding: 1.5rem;
-    border-radius: 4px;
-    font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 0.85rem;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-.hidden {
+.file-input {
     display: none;
 }
 
-/* Analytics Styles */
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-label:hover {
+    border-color: var(--accent);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.upload-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Export Instructions */
+.export-instructions {
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+}
+
+.export-instructions summary {
+    padding: 16px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-secondary);
+    user-select: none;
+    transition: var(--transition);
+}
+
+.export-instructions summary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.instructions-content {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.platform-note {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid #f59e0b;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.instruction-section {
+    margin-bottom: 20px;
+}
+
+.instruction-section h4 {
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.instruction-section ol {
+    margin-left: 20px;
+    color: var(--text-secondary);
+}
+
+.instruction-section li {
+    margin-bottom: 6px;
+}
+
+.privacy-note {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* ============================================
+   Decision Engine (Book Recommender)
+   ============================================ */
+.decision-step {
+    transition: var(--transition);
+}
+
+.decision-step.hidden {
+    display: none;
+}
+
+.step-question {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.step-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.step-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: var(--transition);
+}
+
+.step-btn:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.step-btn.selected {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.recommend-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px 28px;
+    color: var(--bg-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.recommend-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.candidate-count {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.selections-summary {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.selections-summary strong {
+    color: var(--accent);
+}
+
+/* Recommendation Card */
+.recommendation-card {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.recommendation-card h4 {
+    color: var(--accent);
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.book-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.book-author {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.book-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.book-meta span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.book-score {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.no-match {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 24px;
+    text-align: center;
+}
+
+/* ============================================
+   Analytics
+   ============================================ */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
 .metric-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 6px;
-    border-left: 4px solid #2c3e50;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    transition: var(--transition);
+}
+
+.metric-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(16, 185, 129, 0.2);
 }
 
 .metric-card h3 {
-    color: #2c3e50;
+    color: var(--accent);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.metric-card h4 {
+    color: var(--text-primary);
     font-size: 1.1rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
 }
 
 .metric-card p {
-    margin-bottom: 0.5rem;
-    color: #555;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 8px;
 }
 
 .metric-card ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .metric-card li {
-    padding: 0.25rem 0;
-    color: #555;
-    border-bottom: 1px solid #eee;
+    padding: 6px 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
 }
 
 .metric-card li:last-child {
     border-bottom: none;
 }
 
-/* Metric Descriptions */
-.metric-description {
-    color: #666;
-    font-size: 0.85rem;
-    font-style: italic;
-    margin-bottom: 0.75rem;
-    margin-top: -0.5rem;
-}
-
-.section-description {
-    color: #666;
-    font-size: 0.9rem;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-    margin-top: -1rem;
-}
-
-/* Taste Profile Styles */
-.taste-profile {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid #ddd;
-}
-
-.taste-profile h3 {
-    color: #2c3e50;
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
-}
-
-.metric-card h4 {
-    color: #34495e;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.25rem;
-    border-bottom: 1px solid #eee;
-}
-
-/* Backlog Intelligence Styles */
+/* Section Blocks */
+.taste-profile,
 .backlog-intelligence {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid #ddd;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
 }
 
+.taste-profile h3,
 .backlog-intelligence h3 {
-    color: #2c3e50;
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
 }
 
-/* Decision Engine Styles */
-#decision-engine-section {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid #ddd;
+/* ============================================
+   Utility Classes
+   ============================================ */
+.hidden {
+    display: none !important;
 }
 
-#decision-engine-section h2 {
-    color: #2c3e50;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.filter-panel {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.filter-group label {
-    font-weight: 600;
-    color: #34495e;
-    margin-bottom: 0.5rem;
-}
-
-.filter-group select,
-.filter-group input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-}
-
-.recommend-btn {
-    background-color: #2c3e50;
-    color: white;
-    padding: 0.75rem 2rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 1.5rem;
-}
-
-.recommend-btn:hover {
-    background-color: #34495e;
-}
-
-.recommendation-result {
-    margin-top: 1rem;
-}
-
-.recommendation-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 6px;
-    border-left: 4px solid #2c3e50;
-}
-
-.recommendation-card h4 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
-}
-
-.book-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.book-author {
-    color: #666;
-    margin-bottom: 1rem;
-}
-
-.book-meta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-
-.book-meta span {
-    background: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.book-score {
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.no-match {
-    color: #666;
+/* Evaluating/Enriching States */
+.evaluating,
+.enriching {
+    color: var(--text-muted);
     font-style: italic;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--accent);
+    text-align: center;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 16px;
+    }
+    
+    .content-card {
+        padding: 20px;
+    }
+    
+    .step-options {
+        gap: 8px;
+    }
+    
+    .step-btn {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .card-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .upload-label {
+        padding: 32px 20px;
+    }
+    
+    .book-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
 }

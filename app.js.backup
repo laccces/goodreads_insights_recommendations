@@ -867,540 +867,102 @@ function calculateBacklogLengthDistribution(unreadBooks) {
 }
 
 // ============================================
-
+// Phase 5: Decision Engine
 // ============================================
-// Phase 5: Behavioural Decision Funnel
-// ============================================
-
-// Global state for decision flow
-let decisionState = {
-    currentStep: 1,
-    selections: {
-        timeInvestment: '',
-        behaviourPreference: '',
-        backlogPreference: '',
-        riskPreference: ''
-    },
-    candidates: [],
-    allBooks: [],
-    behaviourProfile: null
-};
 
 /**
- * Initialises the behavioural decision funnel.
+ * Initialises the decision engine.
  * @param {Array} wantToReadBooks - Books marked as "want to read"
  */
 function initDecisionEngine(wantToReadBooks) {
     const decisionSection = document.getElementById('decision-engine-section');
+    const genreFilter = document.getElementById('genre-filter');
+    const recommendBtn = document.getElementById('recommend-btn');
     
     // Show the decision engine section
     decisionSection.classList.remove('hidden');
     
-    // Store books and derive behaviour profile
-    decisionState.allBooks = wantToReadBooks;
-    decisionState.candidates = [...wantToReadBooks];
-    decisionState.behaviourProfile = deriveBehaviourProfile();
+    // Populate genre dropdown
+    populateGenreDropdown(wantToReadBooks, genreFilter);
     
-    // Reset state
-    decisionState.currentStep = 1;
-    decisionState.selections = {
-        timeInvestment: '',
-        behaviourPreference: '',
-        backlogPreference: '',
-        riskPreference: ''
-    };
-    
-    // Setup step buttons
-    setupStepButtons();
-    
-    // Setup back buttons
-    setupBackButtons();
-    
-    // Setup start over button
-    const startOverBtn = document.getElementById('start-over-btn');
-    if (startOverBtn) {
-        startOverBtn.addEventListener('click', () => {
-            resetDecisionFlow();
-        });
-    }
-    
-    // Show step 1
-    showStep(1);
-    updateCandidateCount();
-}
-
-/**
- * Sets up step button event listeners.
- */
-function setupStepButtons() {
-    document.querySelectorAll('.step-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const step = e.target.dataset.step;
-            const value = e.target.dataset.value;
-            
-            // Store selection
-            decisionState.selections[step] = value;
-            
-            // Handle based on current step
-            if (decisionState.currentStep === 1) {
-                // Apply time filter
-                const filtered = applyTimeFilter(decisionState.candidates, value);
-                if (filtered.length === 0) {
-                    showNoCandidatesMessage();
-                    return;
-                }
-                decisionState.candidates = filtered;
-                advanceStep(2);
-            } else if (decisionState.currentStep === 2) {
-                advanceStep(3);
-            } else if (decisionState.currentStep === 3) {
-                advanceStep(4);
-            } else if (decisionState.currentStep === 4) {
-                // Final step - run recommendation
-                runRecommendation();
-            }
-        });
-    });
-}
-
-/**
- * Sets up back button event listeners.
- */
-function setupBackButtons() {
-    document.querySelectorAll('.back-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const targetStep = parseInt(e.target.dataset.step);
-            
-            // Clear filters from steps we're going back past
-            if (targetStep < decisionState.currentStep) {
-                if (decisionState.currentStep > 3) {
-                    decisionState.selections.riskPreference = '';
-                }
-                if (decisionState.currentStep > 2) {
-                    decisionState.selections.backlogPreference = '';
-                }
-                if (decisionState.currentStep > 1) {
-                    decisionState.selections.behaviourPreference = '';
-                }
-            }
-            
-            // If going back to step 1, reset candidates
-            if (targetStep === 1) {
-                decisionState.candidates = [...decisionState.allBooks];
-                decisionState.selections.timeInvestment = '';
-            }
-            
-            // Remove summary displays
-            document.querySelectorAll('.selections-summary').forEach(el => el.remove());
-            
-            advanceStep(targetStep);
-        });
-    });
-}
-
-/**
- * Applies time investment filter.
- * @param {Array} books - Books to filter
- * @param {string} selection - User selection
- * @returns {Array} Filtered books
- */
-function applyTimeFilter(books, selection) {
-    if (!selection || selection === 'any') {
-        return books;
-    }
-    
-    return books.filter(book => {
-        if (book.pages <= 0) return selection === 'any';
+    // Attach event listener to recommend button
+    recommendBtn.addEventListener('click', async () => {
+        const resultDiv = document.getElementById('recommendation-result');
         
-        if (selection === 'quick') return book.pages < 300;
-        if (selection === 'moderate') return book.pages >= 300 && book.pages <= 500;
-        if (selection === 'long') return book.pages > 500;
-        return true;
-    });
-}
-
-/**
- * Derives user's reading behaviour profile from read books.
- * @returns {Object} Behaviour profile
- */
-function deriveBehaviourProfile() {
-    const readBooks = books.filter(b => b.dateRead !== null);
-    
-    if (readBooks.length === 0) {
-        return { dominantLength: null, dominantEra: null, topAuthors: [] };
-    }
-    
-    // Find dominant length bucket
-    const lengthCounts = { quick: 0, moderate: 0, long: 0 };
-    readBooks.forEach(book => {
-        if (book.pages > 0) {
-            if (book.pages < 300) lengthCounts.quick++;
-            else if (book.pages <= 500) lengthCounts.moderate++;
-            else lengthCounts.long++;
-        }
-    });
-    const dominantLength = Object.entries(lengthCounts)
-        .sort((a, b) => b[1] - a[1])[0][0];
-    
-    // Find dominant era bucket
-    const eraCounts = { classic: 0, late20th: 0, modern: 0 };
-    readBooks.forEach(book => {
-        if (book.publicationYear > 0) {
-            if (book.publicationYear < 1950) eraCounts.classic++;
-            else if (book.publicationYear <= 1999) eraCounts.late20th++;
-            else eraCounts.modern++;
-        }
-    });
-    const dominantEra = Object.entries(eraCounts)
-        .sort((a, b) => b[1] - a[1])[0][0];
-    
-    // Find top authors
-    const authorCounts = {};
-    readBooks.forEach(book => {
-        if (book.author) {
-            authorCounts[book.author] = (authorCounts[book.author] || 0) + 1;
-        }
-    });
-    const topAuthors = Object.entries(authorCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([author]) => author);
-    
-    return { dominantLength, dominantEra, topAuthors, avgRating: average(readBooks.map(b => b.averageRating).filter(r => r > 0)) };
-}
-
-/**
- * Advances to specified step.
- * @param {number} stepNumber - Step to show
- */
-function advanceStep(stepNumber) {
-    // Hide current step
-    const currentStepEl = document.getElementById(`step-${decisionState.currentStep}`);
-    if (currentStepEl) {
-        currentStepEl.classList.add('hidden');
-    }
-    
-    // Show new step
-    decisionState.currentStep = stepNumber;
-    showStep(stepNumber);
-    updateCandidateCount();
-}
-
-/**
- * Shows specified step.
- * @param {number} stepNumber - Step to show
- */
-function showStep(stepNumber) {
-    // Hide all steps
-    document.querySelectorAll('.decision-step').forEach(el => {
-        el.classList.add('hidden');
-    });
-    
-    // Show target step
-    const stepEl = document.getElementById(`step-${stepNumber}`);
-    if (stepEl) {
-        stepEl.classList.remove('hidden');
+        // Show initial status
+        resultDiv.innerHTML = '<p class="evaluating">Scoring books...</p>';
+        recommendBtn.disabled = true;
         
-        // Add selected preferences summary for steps 2-4, placed after options
-        if (stepNumber >= 2 && stepNumber <= 4) {
-            const existingSummary = stepEl.querySelector('.selections-summary');
-            if (existingSummary) {
-                existingSummary.remove();
-            }
-            
-            const summary = document.createElement('div');
-            summary.className = 'selections-summary';
-            summary.style.cssText = 'background: #e9ecef; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;';
-            
-            let summaryText = '<strong>Your preferences so far:</strong><br>';
-            if (decisionState.selections.timeInvestment) {
-                const timeLabels = { quick: 'Quick read', moderate: 'Moderate', long: 'Long immersion', any: 'Any length' };
-                summaryText += `• Time: ${timeLabels[decisionState.selections.timeInvestment] || decisionState.selections.timeInvestment}<br>`;
-            }
-            if (decisionState.selections.behaviourPreference && stepNumber > 2) {
-                const behLabels = { familiar: 'Stick to what I love', different: 'Try something different', any: 'No preference' };
-                summaryText += `• Style: ${behLabels[decisionState.selections.behaviourPreference] || decisionState.selections.behaviourPreference}<br>`;
-            }
-            if (decisionState.selections.backlogPreference && stepNumber > 3) {
-                const backLabels = { old: 'Clear something old', new: 'Read something new', any: 'No preference' };
-                summaryText += `• Backlog: ${backLabels[decisionState.selections.backlogPreference] || decisionState.selections.backlogPreference}<br>`;
-            }
-            
-            summary.innerHTML = summaryText;
-            
-            // Insert after the options div
-            const optionsDiv = stepEl.querySelector('.step-options');
-            if (optionsDiv) {
-                optionsDiv.after(summary);
-            }
-        }
-    }
-}
-
-/**
- * Updates candidate count display.
- */
-function updateCandidateCount() {
-    // Only show count for step 1 (actual filtering)
-    if (decisionState.currentStep !== 1) {
-        return;
-    }
-    
-    const count = decisionState.candidates.length;
-    const stepEl = document.getElementById(`step-${decisionState.currentStep}`);
-    if (stepEl) {
-        const countEl = stepEl.querySelector('.candidate-count');
-        if (countEl) {
-            countEl.textContent = `${count} book${count !== 1 ? 's' : ''} available`;
-        }
-    }
-}
-
-/**
- * Shows message when no candidates remain.
- */
-function showNoCandidatesMessage() {
-    const stepEl = document.getElementById(`step-${decisionState.currentStep}`);
-    const countEl = stepEl.querySelector('.candidate-count');
-    if (countEl) {
-        countEl.innerHTML = `No books match. <button onclick="relaxConstraint()" class="step-btn" style="margin-top: 0.5rem;">Relax Previous Choice</button>`;
-    }
-}
-
-/**
- * Relaxes the previous constraint.
- */
-function relaxConstraint() {
-    // Reset candidates to all books
-    decisionState.candidates = [...decisionState.allBooks];
-    
-    // Clear previous selection
-    if (decisionState.currentStep === 2) {
-        decisionState.selections.timeInvestment = '';
-    }
-    
-    updateCandidateCount();
-}
-
-/**
- * Runs final recommendation scoring.
- */
-function runRecommendation() {
-    const resultDiv = document.getElementById('recommendation-result');
-    
-    // Hide step 4, show result
-    document.getElementById('step-4').classList.add('hidden');
-    document.getElementById('step-result').classList.remove('hidden');
-    
-    // Check candidates
-    if (decisionState.candidates.length === 0) {
-        resultDiv.innerHTML = '<p class="no-match">No books match your criteria.</p>';
-        return;
-    }
-    
-    // Score all candidates
-    const scored = decisionState.candidates.map(book => ({
-        book: book,
-        score: calculateFinalScore(book)
-    }));
-    
-    // Sort and select winner
-    scored.sort((a, b) => b.score - a.score);
-    
-    // Mild randomness for tie-breaking (if within 0.5 points)
-    let winner = scored[0];
-    if (scored.length > 1 && scored[1].score >= winner.score - 0.5) {
-        const candidates = scored.filter(s => s.score >= winner.score - 0.5);
-        winner = candidates[Math.floor(Math.random() * candidates.length)];
-    }
-    
-    renderRecommendation({
-        book: winner.book,
-        score: winner.score,
-        totalCandidates: scored.length
+        const filters = getDecisionFilters();
+        const behaviourProfile = getBehaviourProfile();
+        const recommendation = await runDecisionEngine(wantToReadBooks, filters, behaviourProfile);
+        renderRecommendation(recommendation);
+        
+        recommendBtn.disabled = false;
     });
 }
 
 /**
- * Calculates final score for a book.
- * @param {Object} book - Book to score
- * @returns {number} Score
+ * Populates the genre dropdown from unique shelves.
+ * @param {Array} books - Books to extract shelves from
+ * @param {HTMLSelectElement} select - Genre select element
  */
-function calculateFinalScore(book) {
-    let score = book.averageRating || 0;
-    const profile = decisionState.behaviourProfile;
+function populateGenreDropdown(books, select) {
+    const shelves = extractShelvesFromBooks(books);
+    const shelfCounts = {};
     
-    // Step 2: Behaviour alignment
-    if (profile && decisionState.selections.behaviourPreference) {
-        score += applyBehaviourScoring(book, profile, decisionState.selections.behaviourPreference);
-    }
+    shelves.forEach(shelf => {
+        shelfCounts[shelf] = (shelfCounts[shelf] || 0) + 1;
+    });
     
-    // Step 3: Backlog age
-    if (decisionState.selections.backlogPreference) {
-        score += applyBacklogScoring(book, decisionState.selections.backlogPreference);
-    }
+    // Only include shelves appearing at least twice
+    const frequentShelves = Object.entries(shelfCounts)
+        .filter(([shelf, count]) => count >= 2)
+        .sort((a, b) => b[1] - a[1]);
     
-    // Step 4: Risk preference
-    if (decisionState.selections.riskPreference) {
-        score += applyRiskScoring(book, decisionState.selections.riskPreference, profile);
-    }
-    
-    return score;
+    frequentShelves.forEach(([shelf, count]) => {
+        const option = document.createElement('option');
+        option.value = shelf.toLowerCase();
+        option.textContent = `${shelf} (${count})`;
+        select.appendChild(option);
+    });
 }
 
 /**
- * Applies behaviour alignment scoring.
- * @param {Object} book - Book to score
- * @param {Object} profile - User behaviour profile
- * @param {string} preference - User preference
- * @returns {number} Bonus score
+ * Extracts shelves from books, excluding default shelves.
+ * @param {Array} books - Books to extract from
+ * @returns {Array} Array of shelf names
  */
-function applyBehaviourScoring(book, profile, preference) {
-    if (!profile.dominantLength && !profile.dominantEra) return 0;
+function extractShelvesFromBooks(books) {
+    const ignoredShelves = ['read', 'currently-reading', 'to-read', 'want-to-read'];
+    const allShelves = [];
     
-    let bonus = 0;
+    books.forEach(book => {
+        if (!book.shelves) return;
+        
+        const shelves = book.shelves
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s && !ignoredShelves.includes(s.toLowerCase()));
+        
+        allShelves.push(...shelves);
+    });
     
-    if (preference === 'familiar') {
-        // Bonus for matching dominant patterns
-        if (profile.dominantLength && book.pages > 0) {
-            const bookLength = book.pages < 300 ? 'quick' : book.pages <= 500 ? 'moderate' : 'long';
-            if (bookLength === profile.dominantLength) bonus += 1.5;
-        }
-        if (profile.dominantEra && book.publicationYear > 0) {
-            const bookEra = book.publicationYear < 1950 ? 'classic' : book.publicationYear <= 1999 ? 'late20th' : 'modern';
-            if (bookEra === profile.dominantEra) bonus += 1.5;
-        }
-        if (profile.topAuthors.includes(book.author)) {
-            bonus += 0.5;
-        }
-    } else if (preference === 'different') {
-        // Bonus for NOT matching dominant patterns
-        if (profile.dominantLength && book.pages > 0) {
-            const bookLength = book.pages < 300 ? 'quick' : book.pages <= 500 ? 'moderate' : 'long';
-            if (bookLength !== profile.dominantLength) bonus += 1;
-        }
-        if (profile.dominantEra && book.publicationYear > 0) {
-            const bookEra = book.publicationYear < 1950 ? 'classic' : book.publicationYear <= 1999 ? 'late20th' : 'modern';
-            if (bookEra !== profile.dominantEra) bonus += 1;
-        }
-        if (!profile.topAuthors.includes(book.author)) {
-            bonus += 0.5;
-        }
-    }
-    
-    return bonus;
+    return allShelves;
 }
 
 /**
- * Applies backlog age scoring.
- * @param {Object} book - Book to score
- * @param {string} preference - User preference
- * @returns {number} Bonus score
+ * Gets current filter values from UI.
+ * @returns {Object} Filter values
  */
-function applyBacklogScoring(book, preference) {
-    if (!book.dateAdded) return 0;
-    
-    const yearsSinceAdded = (new Date() - new Date(book.dateAdded)) / (1000 * 60 * 60 * 24 * 365);
-    
-    if (preference === 'old') {
-        // Bonus for older books
-        if (yearsSinceAdded >= 3) return 2;
-        if (yearsSinceAdded >= 1) return 1;
-    } else if (preference === 'new') {
-        // Bonus for newer books
-        if (yearsSinceAdded < 1) return 2;
-        if (yearsSinceAdded < 3) return 1;
-    }
-    
-    return 0;
-}
-
-/**
- * Applies risk preference scoring.
- * @param {Object} book - Book to score
- * @param {string} preference - User preference
- * @param {Object} profile - User behaviour profile
- * @returns {number} Bonus score
- */
-function applyRiskScoring(book, preference, profile) {
-    const rating = book.averageRating || 0;
-    
-    if (preference === 'safe') {
-        // Heavily weight high ratings
-        return rating * 0.5;
-    } else if (preference === 'risky') {
-        // Prefer near user's average, avoid top 10%
-        if (profile && profile.avgRating > 0) {
-            const distanceFromAvg = Math.abs(rating - profile.avgRating);
-            if (rating < profile.avgRating * 1.1 && rating >= 3.7 && rating <= 4.1) {
-                return 1.5 - (distanceFromAvg * 0.3);
-            }
-        }
-    }
-    
-    return 0;
-}
-
-/**
- * Renders the recommendation to the DOM.
- * @param {Object} recommendation - Recommendation result
- */
-function renderRecommendation(recommendation) {
-    const resultDiv = document.getElementById('recommendation-result');
-    
-    if (!recommendation || !recommendation.book) {
-        resultDiv.innerHTML = '<p class="no-match">No recommendation available.</p>';
-        return;
-    }
-    
-    const book = recommendation.book;
-    
-    resultDiv.innerHTML = `
-        <div class="recommendation-card">
-            <h4>Recommended Book</h4>
-            <div class="book-details">
-                <p class="book-title">${book.title || 'Unknown Title'}</p>
-                <p class="book-author">by ${book.author || 'Unknown Author'}</p>
-                <div class="book-meta">
-                    ${book.publicationYear ? `<span>Published: ${book.publicationYear}</span>` : ''}
-                    ${book.pages ? `<span>Pages: ${book.pages}</span>` : ''}
-                    ${book.averageRating ? `<span>Rating: ${book.averageRating.toFixed(2)}</span>` : ''}
-                </div>
-                <p class="book-score">Selected from ${recommendation.totalCandidates} candidates</p>
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Resets the decision flow to start over.
- */
-function resetDecisionFlow() {
-    // Reset state
-    decisionState.currentStep = 1;
-    decisionState.selections = {
-        timeInvestment: '',
-        behaviourPreference: '',
-        backlogPreference: '',
-        riskPreference: ''
+function getDecisionFilters() {
+    return {
+        genre: document.getElementById('genre-filter').value,
+        length: document.getElementById('length-filter').value,
+        era: document.getElementById('era-filter').value,
+        minRating: parseFloat(document.getElementById('rating-filter').value) || 0
     };
-    decisionState.candidates = [...decisionState.allBooks];
-    
-    // Hide result
-    document.getElementById('step-result').classList.add('hidden');
-    
-    // Clear selections
-    document.querySelectorAll('.step-btn').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    
-    // Show step 1
-    showStep(1);
-    updateCandidateCount();
 }
-
-// Phase 5b: Helper Functions
-// ============================================
 
 /**
  * Gets user's reading behaviour profile from read books.
@@ -1442,26 +1004,61 @@ function getBehaviourProfile() {
 }
 
 /**
- * Extracts shelves from books, excluding default shelves.
- * @param {Array} books - Books to extract from
- * @returns {Array} Array of shelf names
+ * Runs the decision engine to find a recommendation.
+ * Phase 1: Local scoring without enrichment
+ * Phase 2: Controlled enrichment of top 10
+ * Phase 3: Genre-aware reranking
+ * @param {Array} books - Books to choose from
+ * @param {Object} filters - Filter criteria
+ * @param {Object} behaviourProfile - User's reading behaviour profile
+ * @returns {Object|null} Recommended book or null
  */
-function extractShelvesFromBooks(books) {
-    const ignoredShelves = ['read', 'currently-reading', 'to-read', 'want-to-read'];
-    const allShelves = [];
+async function runDecisionEngine(books, filters, behaviourProfile) {
+    if (!books || books.length === 0) {
+        return null;
+    }
     
-    books.forEach(book => {
-        if (!book.shelves) return;
-        
-        const shelves = book.shelves
-            .split(',')
-            .map(s => s.trim())
-            .filter(s => s && !ignoredShelves.includes(s.toLowerCase()));
-        
-        allShelves.push(...shelves);
+    // Phase 1: Local scoring (no enrichment)
+    let candidates = books.filter(book => book.averageRating >= filters.minRating);
+    
+    if (candidates.length === 0) {
+        return { noMatch: true, reason: 'No books match the minimum rating filter' };
+    }
+    
+    // Score locally and select top 20
+    let scored = candidates.map(book => ({
+        book: book,
+        score: scoreLocally(book, filters, behaviourProfile)
+    }));
+    
+    const top20 = selectTopCandidates(scored, 20);
+    
+    // Phase 2: Controlled enrichment (top 10 only)
+    const resultDiv = document.getElementById('recommendation-result');
+    resultDiv.innerHTML = '<p class="enriching">Fetching genre data for top candidates...</p>';
+    
+    const top10 = top20.slice(0, 10);
+    await enrichCandidates(top10.map(c => c.book), 10);
+    
+    // Phase 3: Genre-aware reranking
+    applyGenreScoring(top10, filters, behaviourProfile);
+    
+    // Sort enriched subset
+    top10.sort((a, b) => {
+        if (b.score !== a.score) {
+            return b.score - a.score;
+        }
+        return b.book.averageRating - a.book.averageRating;
     });
     
-    return allShelves;
+    // Final selection
+    const winner = top10[0] || top20[0];
+    
+    return {
+        book: winner.book,
+        score: winner.score,
+        totalCandidates: candidates.length
+    };
 }
 
 /**
@@ -1477,6 +1074,13 @@ function scoreLocally(book, filters, behaviourProfile) {
     
     // Add points for length alignment
     if (book.pages > 0) {
+        if (filters.length) {
+            const lengthMatch = getLengthCategory(book.pages);
+            if (lengthMatch === filters.length) {
+                score += 1;
+            }
+        }
+        
         // Behaviour alignment bonus
         if (behaviourProfile.avgLength) {
             const userPrefLength = behaviourProfile.avgLength < 350 ? 'short' :
@@ -1491,6 +1095,13 @@ function scoreLocally(book, filters, behaviourProfile) {
     
     // Add points for era alignment
     if (book.publicationYear > 0) {
+        if (filters.era) {
+            const eraMatch = getEraCategory(book.publicationYear);
+            if (eraMatch === filters.era) {
+                score += 1;
+            }
+        }
+        
         // Behaviour alignment bonus
         if (behaviourProfile.avgEra) {
             const userPrefEra = behaviourProfile.avgEra < 1950 ? 'classic' :
@@ -1524,6 +1135,40 @@ function selectTopCandidates(scored, limit) {
 }
 
 /**
+ * Applies genre-based scoring to enriched candidates.
+ * @param {Array} candidates - Enriched candidates to score
+ * @param {Object} filters - Filter criteria
+ * @param {Object} behaviourProfile - User's reading behaviour profile
+ */
+function applyGenreScoring(candidates, filters, behaviourProfile) {
+    candidates.forEach(candidate => {
+        const book = candidate.book;
+        
+        // Get book genres from enrichment
+        const bookGenres = book.enrichment?.genres?.map(g => g.toLowerCase()) || [];
+        
+        if (bookGenres.length === 0) {
+            return; // No enrichment data, skip genre scoring
+        }
+        
+        // +2 if user selected genre matches
+        if (filters.genre && bookGenres.includes(filters.genre.toLowerCase())) {
+            candidate.score += 2;
+        }
+        
+        // +1 if matches user's historically dominant genre
+        if (behaviourProfile.dominantGenres && behaviourProfile.dominantGenres.length > 0) {
+            const hasMatchingGenre = behaviourProfile.dominantGenres.some(
+                domGenre => bookGenres.some(bg => bg.includes(domGenre) || domGenre.includes(bg))
+            );
+            if (hasMatchingGenre) {
+                candidate.score += 1;
+            }
+        }
+    });
+}
+
+/**
  * Gets length category for a book.
  * @param {number} pages - Page count
  * @returns {string|null} Category name or null
@@ -1544,6 +1189,42 @@ function getEraCategory(year) {
     if (year < 1950) return 'classic';
     if (year <= 1999) return 'late20th';
     return 'modern';
+}
+
+/**
+ * Renders the recommendation to the DOM.
+ * @param {Object} recommendation - Recommendation result
+ */
+function renderRecommendation(recommendation) {
+    const resultDiv = document.getElementById('recommendation-result');
+    
+    if (!recommendation) {
+        resultDiv.innerHTML = '<p class="no-match">No books available for recommendation.</p>';
+        return;
+    }
+    
+    if (recommendation.noMatch) {
+        resultDiv.innerHTML = `<p class="no-match">${recommendation.reason}</p>`;
+        return;
+    }
+    
+    const book = recommendation.book;
+    
+    resultDiv.innerHTML = `
+        <div class="recommendation-card">
+            <h4>Recommended Book</h4>
+            <div class="book-details">
+                <p class="book-title">${book.title || 'Unknown Title'}</p>
+                <p class="book-author">by ${book.author || 'Unknown Author'}</p>
+                <div class="book-meta">
+                    ${book.publicationYear ? `<span>Published: ${book.publicationYear}</span>` : ''}
+                    ${book.pages ? `<span>Pages: ${book.pages}</span>` : ''}
+                    ${book.averageRating ? `<span>Average Rating: ${book.averageRating.toFixed(2)}</span>` : ''}
+                </div>
+                <p class="book-score">Score: ${recommendation.score.toFixed(1)} (from ${recommendation.totalCandidates} candidates)</p>
+            </div>
+        </div>
+    `;
 }
 
 // ============================================

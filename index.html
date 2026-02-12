@@ -7,67 +7,129 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Library Insights</h1>
-        <p>Upload your book data to explore your reading habits</p>
-    </header>
-
-    <main>
-        <section id="upload-section">
-            <h2>Import Your Library</h2>
-            <input type="file" id="csv-input" accept=".csv" />
-            <p class="hint">Select a CSV file exported from Goodreads or similar service</p>
-        </section>
-
-        <section id="analytics-section" class="hidden">
-            <h2>Analytics</h2>
-            <div id="analytics-content"></div>
-        </section>
-
-        <section id="decision-engine-section" class="hidden">
-            <h2>Decision Engine</h2>
-            <div id="decision-engine-content">
-                <div class="filter-panel">
-                    <div class="filter-group">
-                        <label for="genre-filter">Genre</label>
-                        <select id="genre-filter">
-                            <option value="">Any</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label for="length-filter">Length Preference</label>
-                        <select id="length-filter">
-                            <option value="">Any</option>
-                            <option value="short">Short (&lt;300)</option>
-                            <option value="medium">Medium (300–500)</option>
-                            <option value="long">Long (500–800)</option>
-                            <option value="epic">Epic (800+)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label for="era-filter">Era Preference</label>
-                        <select id="era-filter">
-                            <option value="">Any</option>
-                            <option value="classic">Classic (pre-1950)</option>
-                            <option value="late20th">Late 20th C. (1950–1999)</option>
-                            <option value="modern">Modern (2000+)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label for="rating-filter">Minimum Average Rating</label>
-                        <input type="number" id="rating-filter" min="0" max="5" step="0.1" placeholder="e.g. 4.0" />
-                    </div>
+    <div class="app-container">
+        <main class="main-content">
+            <header class="app-header">
+                <h1>Library Insights</h1>
+                <p>Your reading companion</p>
+            </header>
+            
+            <section id="upload-section" class="content-card">
+                <div class="card-header">
+                    <h2>Import Your Library</h2>
                 </div>
                 
-                <button id="recommend-btn" class="recommend-btn">Recommend a Book</button>
+                <details class="export-instructions">
+                    <summary>How to Export Your Goodreads Library</summary>
+                    <div class="instructions-content">
+                        <p class="platform-note"><strong>Note:</strong> Export must be done in a web browser. The Goodreads app does not support library export.</p>
+                        
+                        <div class="instruction-section">
+                            <h4>Desktop</h4>
+                            <ol>
+                                <li>Log in to Goodreads.</li>
+                                <li>Go to "My Books".</li>
+                                <li>Click "Import and Export" in the left sidebar.</li>
+                                <li>Click "Export Library".</li>
+                                <li>Download the generated CSV file.</li>
+                                <li>Upload it here.</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="instruction-section">
+                            <h4>Mobile (Browser)</h4>
+                            <ol>
+                                <li>Open Goodreads in your mobile browser (not the Goodreads app).</li>
+                                <li>Log in.</li>
+                                <li>Tap the menu and navigate to "My Books".</li>
+                                <li>Scroll to find "Import and Export".</li>
+                                <li>Tap "Export Library".</li>
+                                <li>Download the CSV file to your device.</li>
+                                <li>Return here and upload it.</li>
+                            </ol>
+                        </div>
+                        
+                        <p class="privacy-note">This app runs entirely in your browser. Your data is not uploaded anywhere.</p>
+                    </div>
+                </details>
                 
-                <div id="recommendation-result" class="recommendation-result"></div>
-            </div>
-        </section>
-    </main>
+                <div class="upload-area">
+                    <input type="file" id="csv-input" accept=".csv" class="file-input" />
+                    <label for="csv-input" class="upload-label">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">Click to select your CSV file</span>
+                        <span class="upload-hint">Goodreads export or similar service</span>
+                    </label>
+                </div>
+            </section>
+
+            <section id="analytics-section" class="content-card hidden">
+                <div class="card-header">
+                    <h2>Analytics</h2>
+                </div>
+                <div id="analytics-content"></div>
+            </section>
+
+            <section id="decision-engine-section" class="content-card hidden">
+                <div class="card-header">
+                    <h2>Book Recommender</h2>
+                </div>
+                <div id="decision-engine-content">
+                    <div id="step-container">
+                        <div id="step-1" class="decision-step">
+                            <h3>Step 1: Time Investment</h3>
+                            <p class="step-question">How much time do you want to invest?</p>
+                            <div class="step-options">
+                                <button class="step-btn" data-step="timeInvestment" data-value="quick">Quick read (&lt;300 pages)</button>
+                                <button class="step-btn" data-step="timeInvestment" data-value="moderate">Moderate (300–500 pages)</button>
+                                <button class="step-btn" data-step="timeInvestment" data-value="long">Long immersion (500+ pages)</button>
+                                <button class="step-btn" data-step="timeInvestment" data-value="any">No preference</button>
+                            </div>
+                            <p class="candidate-count"></p>
+                        </div>
+                        
+                        <div id="step-2" class="decision-step hidden">
+                            <h3>Step 2: Familiar vs Different</h3>
+                            <p class="step-question">Stick to what you love, or try something different?</p>
+                            <div class="step-options">
+                                <button class="step-btn" data-step="behaviourPreference" data-value="familiar">Stick to what I love</button>
+                                <button class="step-btn" data-step="behaviourPreference" data-value="different">Try something different</button>
+                                <button class="step-btn" data-step="behaviourPreference" data-value="any">No preference</button>
+                            </div>
+                            <button class="back-btn" data-step="1">Back</button>
+                        </div>
+                        
+                        <div id="step-3" class="decision-step hidden">
+                            <h3>Step 3: Backlog Age</h3>
+                            <p class="step-question">Clear something old, or read something newly added?</p>
+                            <div class="step-options">
+                                <button class="step-btn" data-step="backlogPreference" data-value="old">Clear something old</button>
+                                <button class="step-btn" data-step="backlogPreference" data-value="new">Read something newly added</button>
+                                <button class="step-btn" data-step="backlogPreference" data-value="any">No preference</button>
+                            </div>
+                            <button class="back-btn" data-step="2">Back</button>
+                        </div>
+                        
+                        <div id="step-4" class="decision-step hidden">
+                            <h3>Step 4: Safety vs Risk</h3>
+                            <p class="step-question">Highest rated, or slightly risky?</p>
+                            <div class="step-options">
+                                <button class="step-btn" data-step="riskPreference" data-value="safe">Highest rated</button>
+                                <button class="step-btn" data-step="riskPreference" data-value="risky">Slightly risky</button>
+                                <button class="step-btn" data-step="riskPreference" data-value="any">No preference</button>
+                            </div>
+                            <button class="back-btn" data-step="3">Back</button>
+                        </div>
+                        
+                        <div id="step-result" class="decision-step hidden">
+                            <div id="recommendation-result" class="recommendation-result"></div>
+                            <button id="start-over-btn" class="recommend-btn">Start Over</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="app.js"></script>
