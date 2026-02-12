@@ -264,13 +264,13 @@ function renderAnalytics(metrics) {
             
             <div class="metric-card">
                 <h3>Reading by Year</h3>
-                <p class="metric-description">Your reading activity over time</p>
+                <p class="metric-description">Your book totals for the last five years</p>
     `;
     
-    // Add books per year (last 10 years only)
+    // Add books per year (last 5 years only)
     const currentYear = new Date().getFullYear();
     const yearEntries = Object.entries(metrics.booksPerYear)
-        .filter(([year]) => year >= currentYear - 9)
+        .filter(([year]) => year >= currentYear - 4)
         .sort((a, b) => b[0] - a[0]);
     
     if (yearEntries.length === 0) {
@@ -1355,9 +1355,37 @@ function renderRecommendation(recommendation) {
     
     const book = recommendation.book;
     
+    // Build cover HTML
+    let coverHtml = '';
+    if (book.isbn) {
+        const isbn = book.isbn.replace(/[^0-9X]/gi, '');
+        coverHtml = `
+            <div class="book-cover-container">
+                <img 
+                    src="https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg" 
+                    alt="Cover for ${book.title || 'Unknown Title'}"
+                    class="book-cover"
+                    loading="lazy"
+                    onerror="this.style.display='none'; this.parentElement.classList.add('cover-error');"
+                />
+            </div>
+        `;
+    } else {
+        coverHtml = `
+            <div class="book-cover-container cover-placeholder">
+                <div class="cover-placeholder-content">
+                    <span class="cover-placeholder-icon">📚</span>
+                    <p class="cover-placeholder-title">${book.title || 'Unknown Title'}</p>
+                    <p class="cover-placeholder-author">${book.author || 'Unknown Author'}</p>
+                </div>
+            </div>
+        `;
+    }
+    
     resultDiv.innerHTML = `
         <div class="recommendation-card">
             <h4>Recommended Book</h4>
+            ${coverHtml}
             <div class="book-details">
                 <p class="book-title">${book.title || 'Unknown Title'}</p>
                 <p class="book-author">by ${book.author || 'Unknown Author'}</p>

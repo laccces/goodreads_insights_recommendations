@@ -71,6 +71,19 @@ body {
 .app-header p {
     color: var(--text-muted);
     font-size: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.app-header a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.app-header a:hover {
+    text-decoration: underline;
 }
 
 /* Content Cards */
@@ -137,7 +150,7 @@ p {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 48px 32px;
+    padding: 24px 20px;
     border: 2px dashed var(--border);
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -151,20 +164,20 @@ p {
 }
 
 .upload-icon {
-    font-size: 2.5rem;
-    margin-bottom: 16px;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
     opacity: 0.6;
 }
 
 .upload-text {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .upload-hint {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
 }
 
@@ -321,16 +334,19 @@ p {
 }
 
 .selections-summary {
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
+    background: rgba(5, 150, 105, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 20px;
     margin-top: 20px;
     font-size: 0.9rem;
 }
 
 .selections-summary strong {
     color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
 }
 
 /* Recommendation Card */
@@ -350,6 +366,91 @@ p {
     letter-spacing: 1px;
 }
 
+/* Book Cover */
+.book-cover-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.book-cover {
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: var(--transition);
+}
+
+.book-cover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.cover-placeholder {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 32px;
+    max-width: 180px;
+    width: 100%;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cover-placeholder-content {
+    text-align: center;
+}
+
+.cover-placeholder-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.cover-placeholder-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.cover-placeholder-author {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.cover-error .book-cover {
+    display: none;
+}
+
+.cover-error {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 32px;
+    max-width: 220px;
+    width: 100%;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-error::after {
+    content: '📚';
+    font-size: 3rem;
+    opacity: 0.6;
+}
+
+.book-details {
+    text-align: center;
+}
+
 .book-title {
     font-size: 1.4rem;
     font-weight: 600;
@@ -367,6 +468,7 @@ p {
     gap: 16px;
     flex-wrap: wrap;
     margin-bottom: 16px;
+    justify-content: center;
 }
 
 .book-meta span {
@@ -420,11 +522,28 @@ p {
 }
 
 .metric-card h4 {
-    color: var(--text-primary);
-    font-size: 1.1rem;
+    color: var(--accent);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-bottom: 8px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
+}
+
+.metric-card .metric-description {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 12px;
+}
+
+.taste-profile .section-description,
+.backlog-intelligence .section-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-bottom: 20px;
 }
 
 .metric-card p {
@@ -459,9 +578,11 @@ p {
 
 .taste-profile h3,
 .backlog-intelligence h3 {
-    color: var(--text-primary);
-    margin-bottom: 20px;
-    font-size: 1.3rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* ============================================
