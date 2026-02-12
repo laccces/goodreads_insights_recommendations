@@ -1110,7 +1110,7 @@ function showStep(stepNumber) {
             
             const summary = document.createElement('div');
             summary.className = 'selections-summary';
-            summary.style.cssText = 'background: #e9ecef; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;';
+            summary.style.cssText = 'background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.75rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;';
             
             let summaryText = '<strong>Your preferences so far:</strong><br>';
             if (decisionState.selections.timeInvestment) {
