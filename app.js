@@ -9,27 +9,27 @@ let books = [];
 // Sample Data for Demo
 // ============================================
 
-const SAMPLE_CSV_DATA = `Title,Author,Genre,Year Published,Pages,Date Started,Date Finished,Rating,Average Rating,ISBN,Status
-Project Hail Mary,Andy Weir,Science Fiction,2021,496,03/01/2025,12/01/2025,5,4.35,9780593135204,Read
-Kindred,Octavia E. Butler,Science Fiction,1979,264,15/01/2025,22/01/2025,5,4.25,9780807083697,Read
-The Midnight Library,Matt Haig,Fiction,2020,304,25/01/2025,01/02/2025,4,3.85,9780525559474,Read
-Educated,Tara Westover,Memoir,2018,352,03/02/2025,12/02/2025,4,4.15,9780399590504,Read
-Atomic Habits,James Clear,Self Help,2018,320,15/02/2025,22/02/2025,4,4.35,9780735211292,Read
-The Handmaid's Tale,Margaret Atwood,Dystopian,1985,311,01/03/2025,08/03/2025,5,4.15,9780385490818,Read
-Becoming,Michelle Obama,Memoir,2018,426,10/03/2025,18/03/2025,4,4.45,9781524763138,Read
-Circe,Madeline Miller,Fantasy,2018,393,20/03/2025,30/03/2025,5,4.25,9780316334756,Read
-The Pragmatic Programmer,Andrew Hunt,Technology,1999,352,01/04/2025,12/04/2025,4,4.35,9780201616224,Read
-Dune,Frank Herbert,Science Fiction,1965,412,05/04/2025,15/04/2025,5,4.25,9780441172719,Read
-Deep Work,Cal Newport,Productivity,2016,296,15/04/2025,,0,4.15,9781455586691,Currently Reading
-The Vanishing Half,Brit Bennett,Fiction,2020,343,18/04/2025,,0,4.05,9780525536291,Currently Reading
-Sapiens,Yuval Noah Harari,History,2011,443,01/05/2024,15/05/2024,4,4.35,9780062316097,Read
-The Power,Naomi Alderman,Science Fiction,2016,386,,,0,3.85,9780316547613,Want to Read
-The Fifth Season,N.K. Jemisin,Fantasy,2015,512,,,0,4.25,9780316229296,Want to Read
-Lean In,Sheryl Sandberg,Business,2013,240,,,0,3.75,9780385349949,Want to Read
-Thinking Fast and Slow,Daniel Kahneman,Psychology,2011,499,20/05/2024,10/06/2024,4,4.05,9780374275631,Read
-The Martian,Andy Weir,Science Fiction,2014,369,01/06/2024,15/06/2024,5,4.35,9780804139021,Read
-Gone Girl,Gillian Flynn,Thriller,2012,432,,,0,3.95,9780307588371,Want to Read
-Station Eleven,Emily St. John Mandel,Fiction,2014,333,20/06/2024,05/07/2024,4,3.95,9780385353305,Read`;
+const SAMPLE_CSV_DATA = `Book Id,Title,Author,Author l-f,Additional Authors,ISBN,ISBN13,My Rating,Average Rating,Publisher,Binding,Number of Pages,Year Published,Original Publication Year,Date Read,Date Added,Bookshelves
+1,Project Hail Mary,Andy Weir,Weir Andy,,9780593135204,9780593135204,5,4.35,Random House,Paperback,496,2021,2021,03/01/2025,01/01/2025,read
+2,Kindred,Octavia E. Butler,Butler Octavia E.,,9780807083697,9780807083697,5,4.25,Beacon Press,Paperback,264,1979,1979,15/01/2025,10/01/2025,read
+3,The Midnight Library,Matt Haig,Haig Matt,,9780525559474,9780525559474,4,3.85,Viking,Hardcover,304,2020,2020,25/01/2025,20/01/2025,read
+4,Educated,Tara Westover,Westover Tara,,9780399590504,9780399590504,4,4.15,Random House,Hardcover,352,2018,2018,03/02/2025,01/02/2025,read
+5,Atomic Habits,James Clear,Clear James,,9780735211292,9780735211292,4,4.35,Avery,Hardcover,320,2018,2018,15/02/2025,10/02/2025,read
+6,The Handmaid's Tale,Margaret Atwood,Atwood Margaret,,9780385490818,9780385490818,5,4.15,McClelland,Paperback,311,1985,1985,01/03/2025,25/02/2025,read
+7,Becoming,Michelle Obama,Obama Michelle,,9781524763138,9781524763138,4,4.45,Crown,Hardcover,426,2018,2018,10/03/2025,05/03/2025,read
+8,Circe,Madeline Miller,Miller Madeline,,9780316334756,9780316334756,5,4.25,Bloomsbury,Paperback,393,2018,2018,20/03/2025,15/03/2025,read
+9,The Pragmatic Programmer,Andrew Hunt,Hunt Andrew,,9780201616224,9780201616224,4,4.35,Addison-Wesley,Paperback,352,1999,1999,01/04/2025,25/03/2025,read
+10,Dune,Frank Herbert,Herbert Frank,,9780441172719,9780441172719,5,4.25,Ace,Paperback,412,1965,1965,05/04/2025,01/04/2025,read
+11,Deep Work,Cal Newport,Newport Cal,,9781455586691,9781455586691,0,4.15,Grand Central,Paperback,296,2016,2016,,15/04/2025,currently-reading
+12,The Vanishing Half,Brit Bennett,Bennett Brit,,9780525536291,9780525536291,0,4.05,Riverhead,Hardcover,343,2020,2020,,18/04/2025,currently-reading
+13,Sapiens,Yuval Noah Harari,Harari Yuval Noah,,9780062316097,9780062316097,4,4.35,Harper,Paperback,443,2011,2011,01/05/2024,25/04/2024,read
+14,The Power,Naomi Alderman,Alderman Naomi,,9780316547613,9780316547613,0,3.85,Back Bay,Paperback,386,2016,2016,,20/04/2025,to-read
+15,The Fifth Season,N.K. Jemisin,Jemisin N.K.,,9780316229296,9780316229296,0,4.25,Orbit,Paperback,512,2015,2015,,15/04/2025,to-read
+16,Lean In,Sheryl Sandberg,Sandberg Sheryl,,9780385349949,9780385349949,0,3.75,Knoph,Hardcover,240,2013,2013,,10/04/2025,to-read
+17,Thinking Fast and Slow,Daniel Kahneman,Kahneman Daniel,,9780374275631,9780374275631,4,4.05,Farrar,Paperback,499,2011,2011,20/05/2024,15/05/2024,read
+18,The Martian,Andy Weir,Weir Andy,,9780804139021,9780804139021,5,4.35,Crown,Paperback,369,2014,2014,01/06/2024,25/05/2024,read
+19,Gone Girl,Gillian Flynn,Flynn Gillian,,9780307588371,9780307588371,0,3.95,Crown,Paperback,432,2012,2012,,15/04/2025,to-read
+20,Station Eleven,Emily St. John Mandel,Mandel Emily St. John,,9780385353305,9780385353305,4,3.95,Vintage,Paperback,333,2014,2014,20/06/2024,15/06/2024,read`;
 
 // ============================================
 // Data Normalisation
@@ -58,7 +58,7 @@ function normaliseBook(row) {
         dateAdded: cleanString(row['Date Added'] || row.dateAdded || row['Date Started'] || null),
         
         // Categorisation
-        shelves: cleanString(row.Bookshelves || row.shelves || row.Status || ''),
+        shelves: cleanString(row.Bookshelves || row.shelves || ''),
         
         // ISBN - prefer 13, fallback to 10, clean Excel artifacts
         isbn: extractIsbn(row.ISBN13 || row.ISBN || row.isbn13 || row.isbn)
