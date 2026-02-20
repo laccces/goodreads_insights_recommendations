@@ -1779,6 +1779,27 @@ function mapSubjectsToGenres(subjects) {
     return Array.from(genres);
 }
 
+// ============================================
+// Export functions for testing
+// ============================================
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        extractYear,
+        getLengthCategory,
+        getEraCategory,
+        extractIsbn,
+        average,
+        median,
+        getMostFrequent,
+        parseDateSafe,
+        applyTimeFilter,
+        scoreLocally,
+        selectTopCandidates,
+        deriveBehaviourProfile,
+        books
+    };
+}
 
 // ============================================
 // Initialise
