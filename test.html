@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodReads Library Explorer - Test Suite</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-page-header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .test-page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .test-page-header p {
+            color: var(--text-muted);
+        }
+        
+        .test-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .test-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 14px 28px;
+            color: var(--bg-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .test-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        .test-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .test-btn.secondary:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        #test-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            min-height: 400px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--accent);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .test-summary {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+        
+        .test-summary.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .test-summary.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-page-header">
+        <h1>🧪 Test Suite</h1>
+        <p>Unit tests and validation for GoodReads Library Explorer</p>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-controls">
+            <button id="run-all-tests" class="test-btn">Run All Tests</button>
+            <button id="clear-output" class="test-btn secondary">Clear Output</button>
+            <a href="index.html" class="back-link">← Back to App</a>
+        </div>
+        
+        <div id="test-output">
+Click "Run All Tests" to begin testing...
+
+Test Categories:
+  📦 Data Normalization (ISBN, dates, categories)
+  📊 Calculations (averages, medians, sorting)
+  🎯 Scoring Logic (filters, rankings, behaviour)
+  📋 Sample Data Validation
+        </div>
+        
+        <div id="test-summary" class="test-summary" style="display: none;"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="app.js"></script>
+    <script src="test.js"></script>
+    <script>
+        // Override console.log to display in test output
+        const outputDiv = document.getElementById('test-output');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        function updateOutput(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : '';
+            outputDiv.textContent += `\n${prefix} ${message}`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            updateOutput(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            updateOutput(args.join(' '), 'error');
+        };
+        
+        // Test runner buttons
+        document.getElementById('run-all-tests').addEventListener('click', () => {
+            outputDiv.textContent = '🚀 Starting tests...\n\n';
+            
+            // Small delay to let UI update
+            setTimeout(() => {
+                const results = runAllTests();
+                
+                // Show summary
+                const summaryDiv = document.getElementById('test-summary');
+                summaryDiv.style.display = 'block';
+                
+                if (results.failed === 0) {
+                    summaryDiv.className = 'test-summary success';
+                    summaryDiv.innerHTML = `<strong>✅ All tests passed!</strong><br>${results.passed} tests completed successfully`;
+                } else {
+                    summaryDiv.className = 'test-summary error';
+                    summaryDiv.innerHTML = `<strong>⚠️ ${results.failed} test(s) failed</strong><br>${results.passed} passed, ${results.failed} failed`;
+                }
+            }, 100);
+        });
+        
+        document.getElementById('clear-output').addEventListener('click', () => {
+            outputDiv.textContent = 'Ready to test. Click "Run All Tests" to begin.';
+            document.getElementById('test-summary').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

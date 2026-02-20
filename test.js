@@ -294,7 +294,7 @@ const SampleDataValidator = {
 // ============================================
 
 // ============================================
-// Auto-run or manual trigger
+// Manual trigger only - no auto-run
 // ============================================
 
 function runAllTests() {
@@ -313,26 +313,7 @@ function runAllTests() {
     return testResults;
 }
 
-// Run tests automatically when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Add event listener to test button
-    const testBtn = document.getElementById('run-tests-btn');
-    if (testBtn) {
-        testBtn.addEventListener('click', () => {
-            console.clear();
-            runAllTests();
-        });
-    }
-    
-    // Run tests on page load (with delay to ensure app.js is loaded)
-    setTimeout(() => {
-        if (typeof books !== 'undefined') {
-            runAllTests();
-        }
-    }, 1000);
-});
-
-// Export for potential use in other contexts
+// Export for use in test.html
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { TestRunner, SampleDataValidator, runAllTests };
 }
