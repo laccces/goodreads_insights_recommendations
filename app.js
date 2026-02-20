@@ -6,6 +6,27 @@
 let books = [];
 
 // ============================================
+// Sample Data for Demo
+// ============================================
+
+const SAMPLE_CSV_DATA = `Title,Author,Genre,Year Published,Pages,Date Started,Date Finished,Rating,Status
+Project Hail Mary,Andy Weir,Science Fiction,2021,496,03/01/2025,12/01/2025,5,Read
+Kindred,Octavia E. Butler,Science Fiction,1979,264,15/01/2025,22/01/2025,5,Read
+The Midnight Library,Matt Haig,Fiction,2020,304,25/01/2025,01/02/2025,4,Read
+Educated,Tara Westover,Memoir,2018,352,03/02/2025,12/02/2025,4,Read
+Atomic Habits,James Clear,Self Help,2018,320,15/02/2025,22/02/2025,4,Read
+The Handmaid's Tale,Margaret Atwood,Dystopian,1985,311,01/03/2025,08/03/2025,5,Read
+Becoming,Michelle Obama,Memoir,2018,426,10/03/2025,18/03/2025,4,Read
+Circe,Madeline Miller,Fantasy,2018,393,20/03/2025,30/03/2025,5,Read
+The Pragmatic Programmer,Andrew Hunt,Technology,1999,352,01/04/2025,12/04/2025,4,Read
+Deep Work,Cal Newport,Productivity,2016,296,15/04/2025,,0,Currently Reading
+The Vanishing Half,Brit Bennett,Fiction,2020,343,18/04/2025,,0,Currently Reading
+Sapiens,Yuval Noah Harari,History,2011,443,,,0,Want to Read
+The Power,Naomi Alderman,Science Fiction,2016,386,,,0,Want to Read
+The Fifth Season,N.K. Jemisin,Fantasy,2015,512,,,0,Want to Read
+Lean In,Sheryl Sandberg,Business,2013,240,,,0,Want to Read`;
+
+// ============================================
 // Data Normalisation
 // ============================================
 
@@ -25,14 +46,14 @@ function normaliseBook(row) {
         pages: parseNumber(row['Number of Pages'] || row.pages),
         publicationYear: parseNumber(row['Original Publication Year'] || row.publicationYear || row['Year Published']),
         averageRating: parseFloatOrZero(row['Average Rating'] || row.averageRating),
-        userRating: parseFloatOrZero(row['My Rating'] || row.userRating || row['My Rating']),
+        userRating: parseFloatOrZero(row['My Rating'] || row.userRating || row.Rating || row['My Rating']),
         
         // Date fields
-        dateRead: cleanString(row['Date Read'] || row.dateRead || null),
-        dateAdded: cleanString(row['Date Added'] || row.dateAdded || null),
+        dateRead: cleanString(row['Date Read'] || row.dateRead || row['Date Finished'] || null),
+        dateAdded: cleanString(row['Date Added'] || row.dateAdded || row['Date Started'] || null),
         
         // Categorisation
-        shelves: cleanString(row.Bookshelves || row.shelves || ''),
+        shelves: cleanString(row.Bookshelves || row.shelves || row.Status || ''),
         
         // ISBN - prefer 13, fallback to 10, clean Excel artifacts
         isbn: extractIsbn(row.ISBN13 || row.ISBN || row.isbn13 || row.isbn)
@@ -107,12 +128,32 @@ function extractIsbn(value) {
  */
 function initUploadHandler() {
     const fileInput = document.getElementById('csv-input');
+    const sampleDataBtn = document.getElementById('sample-data-btn');
     
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
         
         processCSV(file);
+    });
+    
+    // Handle sample data button
+    if (sampleDataBtn) {
+        sampleDataBtn.addEventListener('click', () => {
+            loadSampleData();
+        });
+    }
+}
+
+/**
+ * Loads sample data for demo purposes.
+ */
+function loadSampleData() {
+    Papa.parse(SAMPLE_CSV_DATA, {
+        header: true,
+        skipEmptyLines: true,
+        complete: handleParseComplete,
+        error: handleParseError
     });
 }
 
